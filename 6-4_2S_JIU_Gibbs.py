@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import IEU_inverse_2S as ieu
 
 import pandas as pd
@@ -15,11 +9,7 @@ from matplotlib import pyplot as plt
 N_sam = 100*2500
 np.random.seed(10)
 
-
-# In[2]:
-
-
-beta_gt = 200
+beta_gt = int(sys.argv[1])
 gamma_gt = 1.0
 l01_gt = 2
 l10_gt = 1
@@ -29,15 +19,7 @@ w_all = (df['counts']).to_numpy(np.int64)
 T_all = (df['times']).to_numpy()
 N_RNA = 2*w_all.max()
 
-
-# In[3]:
-
-
 S_prop = np.eye(4)*1e-8
-
-
-# In[4]:
-
 
 ground = np.array((beta_gt,gamma_gt,l01_gt,l10_gt))
 th_gt = ieu.params(ground,N_RNA)
@@ -53,11 +35,6 @@ for i in range(10):
 ll_gt = np.mean(ll_gt_list)
 ll_gt
 
-
-
-# In[5]:
-
-
 theta = np.concatenate(([w_all.max()],np.ones(3)*1.5))
 th_ieu = ieu.params(theta,N_RNA)
 
@@ -71,9 +48,6 @@ th=th_ieu
 
 # **Doing adaptative**
 
-# In[6]:
-
-
 llw_list =[]
 llk_list =[]
 th_list =[]
@@ -81,14 +55,8 @@ th_list =[]
 times100 =[]
 
 
-# In[7]:
-
-
 mat_list=[]
 mat_list.append(S_prop)
-
-
-# In[8]:
 
 
 acc_count=0
@@ -131,14 +99,9 @@ while acc_count<10:
         
 
 
-# In[9]:
-
 llw_list =[]
 llk_list =[]
 th_list =[]
-
-
-# In[ ]:
 
 
 start=time.time()
@@ -169,14 +132,8 @@ for i in range(len(llw_list),N_sam):
         print(end-start)            
         start=time.time()   
 
-
-# In[ ]:
-
-
 ieu.save_ieu(llw_list,llk_list,th_list,beta_gt)
 
-
-# In[ ]:
 
 
 

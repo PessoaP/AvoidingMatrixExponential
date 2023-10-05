@@ -2,13 +2,12 @@ from forward_STS import *
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-
-np.random.seed(1)
+import sys
 
 N_r = 300
 
-beta_R = 10.*4
-beta_P = .5*4
+beta_R_gt = float(sys.argv[1])
+beta_P_gt = float(sys.argv[2])
 
 l01 = .1
 l10 = .05

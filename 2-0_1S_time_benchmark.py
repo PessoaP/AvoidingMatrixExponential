@@ -86,7 +86,7 @@ for i in range(len(ll_list),N_sam):
 
 
 try:
-    df2 = pd.read_csv('times/{}_times_20.csv'.format(method.upper()),)
+    df2 = pd.read_csv('times/{}_times_20.csv'.format(method.upper()),index=False)
 except:
     df2 = pd.DataFrame()
 label = 'N={}'.format(N)

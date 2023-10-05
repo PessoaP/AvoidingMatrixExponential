@@ -1,4 +1,6 @@
 import RK_inverse_STS as rk
+import KRY_inverse_STS as kry
+import IMU_inverse_STS as imu
 
 import pandas as pd
 import time
@@ -7,6 +9,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import sys
+
+method = sys.argv[2]
+methods = {
+    'rk': rk,
+    'kry': kry,
+    'imu': imu,
+}
+met = methods.get(method)
+if not met:
+    print('method not recognized')
 
 N_sam = 100*20+1
 np.random.seed(200)

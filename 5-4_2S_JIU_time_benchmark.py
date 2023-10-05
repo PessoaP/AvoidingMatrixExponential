@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 N_sam = 100*20
 np.random.seed(10)
 
-beta_gt = 200
+beta_gt = int(sys.argv[1])
 gamma_gt = 1.0
 l01_gt = 2
 l10_gt = 1
