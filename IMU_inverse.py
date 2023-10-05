@@ -74,7 +74,7 @@ def update_th(ll,w_all,T_all,th,S_prop):
         return ll_prop,th_prop
     return ll,th
 
-def save_imu(ll_list,th_list,beta_gt):
+def save(ll_list,th_list,beta_gt):
     ll_pd = np.stack(ll_list)
     th_pd = np.stack(th_list)
 

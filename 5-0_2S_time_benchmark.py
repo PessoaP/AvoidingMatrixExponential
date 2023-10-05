@@ -1,4 +1,6 @@
 import RK_inverse_2S as rk
+import KRY_inverse_2S as kry
+import IMU_inverse_2S as imu
 
 import pandas as pd
 import time
@@ -6,8 +8,21 @@ import time
 import numpy as np 
 from matplotlib import pyplot as plt
 
+import sys
+
+method = sys.argv[2]
+methods = {
+    'rk': rk,
+    'kry': kry,
+    'imu': imu,
+}
+met = methods.get(method)
+if not met:
+    print('method not recognized')
+
+
 N_sam = 100*20
-np.random.seed(100)
+np.random.seed(10000)
 
 beta_gt = 500
 gamma_gt = 1.0
@@ -22,14 +37,14 @@ N_RNA = 2*w_all.max()
 S_prop = np.eye(4)*1e-8
 
 ground = np.array((beta_gt,gamma_gt,l01_gt,l10_gt))
-th_gt = rk.params(ground,N_RNA)
+th_gt = met.params(ground,N_RNA)
 
 ll_gt_list = []
 ll = th_gt.loglike_w(w_all,T_all)
 
 #init at gound truth
 theta = 1.0*ground
-th = rk.params(theta,N_RNA)
+th = met.params(theta,N_RNA)
 
 # **Doing adaptative**
 
@@ -40,7 +55,7 @@ times100 =[]
 
 start=time.time()
 for i in range(len(ll_list),N_sam):
-    ll,th  = rk.update_th(ll,w_all,T_all,th,S_prop)
+    ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)
     
     ll_list.append(ll)
     th_list.append(th.value)
@@ -63,9 +78,9 @@ for i in range(len(ll_list),N_sam):
 
 
 try:
-    df2 = pd.read_csv('times/2S_RK_times_20.csv')
+    df2 = pd.read_csv('times/2S_{}_times_20.csv'.format(method.upper()))
 except:
     df2 = pd.DataFrame()
 label = 'N={}'.format(th.N)
 df2[label] = np.stack(times100)
-df2.to_csv('times/2S_RK_times_20.csv',index=False)
+df2.to_csv('times/2S_{}_times_20.csv'.format(method.upper()),index=False)

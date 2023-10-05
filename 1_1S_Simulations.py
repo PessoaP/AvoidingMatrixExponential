@@ -1,6 +1,6 @@
 from forward import *
 import pandas as pd
-np.random.seed(10)
+
 import sys
 
 N_r = 300

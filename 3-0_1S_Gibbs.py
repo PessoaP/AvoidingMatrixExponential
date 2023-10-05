@@ -1,10 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import RK_inverse as rk
+import KRY_inverse as kry
+import IMU_inverse as imu
+import ME_inverse as me
 
 import pandas as pd
 import time
@@ -12,76 +9,57 @@ import time
 import numpy as np 
 from matplotlib import pyplot as plt
 
-N_sam = 100*1000
-np.random.seed(100)
+import sys
+
+method = sys.argv[2]
+methods = {
+    'rk': rk,
+    'kry': kry,
+    'imu': imu,
+    'me': me
+}
+met = methods.get(method)
+if not met:
+    print('method not recognized')
 
 
-# In[2]:
+N_sam = 100*2500
+np.random.seed(10)
 
-
-beta_gt = 50
+beta_gt = int(sys.argv[1])
 gamma_gt = 1
+
+
 
 df = pd.read_csv('synthetic_data/synthetic_data--beta={}.csv'.format(beta_gt))
 w_all = (df['counts']).to_numpy(int)
 T_all = (df['times']).to_numpy()
 N = 2*w_all.max()
 
-
-# In[3]:
-
-
 S_prop = np.eye(2)*1e-8
 
-
-# In[4]:
-
-
 ground = np.array((beta_gt,gamma_gt))
-th_gt = rk.params(ground,N)
+th_gt = met.params(ground,N)
 
-ll_gt = th_gt.loglike_w(w_all,T_all)
-ll_gt.sum()
+ll_gt = th_gt.loglike_w(w_all,T_all) 
+#this guarantees everything that can be compiled is compiled
 
-
-# In[5]:
-
-
-beta,gamma = rk.naive_estimation(T_all,w_all)
-
-
-# In[6]:
-
+beta,gamma = met.naive_estimation(T_all,w_all)
 
 theta = np.array((beta,gamma))
-th_rk = rk.params(theta,N)
-
-th = th_rk
+th = met.params(theta,N)
 ll = th.loglike_w(w_all,T_all)
 
-rk.update_th(ll,w_all,T_all,th,S_prop)
+met.update_th(ll,w_all,T_all,th,S_prop)
 
 
-# **Doing adaptative**
-
-# In[7]:
-
+# **Doing adaptive**
 
 ll_list =[]
 th_list =[]
 
-#times100 =[]
-
-
-# In[8]:
-
-
 mat_list=[]
 mat_list.append(S_prop)
-
-
-# In[9]:
-
 
 acc_count=0
 i = 0
@@ -89,7 +67,7 @@ i = 0
 start=time.time() 
 while acc_count<10:
     i+=1
-    ll,th  = rk.update_th(ll,w_all,T_all,th,S_prop)    
+    ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())
     th_list.append(th.value)
     
@@ -110,33 +88,23 @@ while acc_count<10:
                 acc_count = 0
             print('accept rate',acceptance)
             if i%300 == 0:
-                S_prop = rk.update_S(th_last)
+                S_prop = met.update_S(th_last)
                 mat_list.append(S_prop)
                 print(S_prop)
             print(end-start)
         start=time.time() 
-        
-
-    
 
 
 # **Restarting chain**
-
-# In[10]:
-
 
 ll_list =[]
 th_list =[]
 
 times100 =[]
 
-
-# In[11]:
-
-
 start=time.time()
 for i in range(len(ll_list),N_sam):
-    ll,th  = rk.update_th(ll,w_all,T_all,th,S_prop)    
+    ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())
     th_list.append(th.value)
     #print(llw,llk, llw+llk)
@@ -153,20 +121,9 @@ for i in range(len(ll_list),N_sam):
             times100.append(end-start)
             print('accept rate',np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0)))
             if i%2000 == 0:
-                rk.save_rk(ll_list,th_list,beta_gt)
+                met.save(ll_list,th_list,beta_gt)
         
         print(end-start)            
         start=time.time()   
 
-
-# In[12]:
-
-
-rk.save_rk(ll_list,th_list,beta_gt)
-
-
-# In[ ]:
-
-
-
-
+met.save(ll_list,th_list,beta_gt)

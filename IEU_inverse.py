@@ -78,7 +78,7 @@ def update_th(llw,llk,k_all,w_all,T_all,th,S_prop):
         return llw_prop,llk_prop,th_prop
     return llw,llk,th
 
-def save_ieu(llw_list,llk_list,th_list,beta_gt):
+def save(llw_list,llk_list,th_list,beta_gt):
     llw_pd = np.stack(llw_list)
     llk_pd = np.stack(llk_list)
     th_pd = np.stack(th_list)
