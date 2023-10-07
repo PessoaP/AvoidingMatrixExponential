@@ -5,6 +5,7 @@ import time
 
 import numpy as np 
 from matplotlib import pyplot as plt
+import sys
 
 N_sam = 100*2500
 np.random.seed(10)
@@ -33,9 +34,8 @@ for i in range(10):
     ll_gt_list.append(llw.sum()+llk.sum())
 
 ll_gt = np.mean(ll_gt_list)
-ll_gt
 
-theta = np.concatenate(([w_all.max()],np.ones(3)*1.5))
+theta = 1.0*ground
 th_ieu = ieu.params(theta,N_RNA)
 
 
@@ -97,6 +97,48 @@ while acc_count<10:
             print(end-start)
         start=time.time() 
         
+#Restarting adaptative
+theta = th_list[np.argmax(np.array(llw_list)+np.array(llw_list))]
+th = ieu.params(theta,N_RNA)
+S_prop = np.eye(4)*1e-8
+
+acc_count=0
+i = 0
+
+start=time.time() 
+while acc_count<10:
+    i+=1
+    llw,llk,th  = ieu.update_th(llw,llk,k_all,w_all,T_all,th,S_prop)
+    llw,llk,k_all = ieu.update_k(llw,llk,k_all,w_all,T_all,th)
+    
+    llw_list.append(llw.sum())
+    llk_list.append(llk.sum())
+    th_list.append(th.value)
+    
+    if i%100 == 0:
+        end=time.time()
+        llw_last = np.stack(llw_list[-101:])
+        llk_last = np.stack(llk_list[-101:])
+        th_last  = np.stack(th_list[-101:])
+
+        print(llw_last.mean()+llk_last.mean())
+        print(th_last.mean(axis=0))
+
+        if i>0:
+            print('iteration ',i)
+            #times100.append(end-start)
+            acceptance = np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0))
+            if acceptance>.2 and acceptance<.5:
+                acc_count+=1
+            else:
+                acc_count = 0
+            print('accept rate',acceptance)
+            if i%300 == 0:
+                S_prop = ieu.update_S(th_last)
+                mat_list.append(S_prop)
+                print(S_prop)
+            print(end-start)
+        start=time.time() 
 
 
 llw_list =[]
@@ -127,12 +169,12 @@ for i in range(len(llw_list),N_sam):
             times100.append(end-start)
             print('accept rate',np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0)))
             if i%2000 == 0:
-                ieu.save_ieu(llw_list,llk_list,th_list,beta_gt)
+                ieu.save(llw_list,llk_list,th_list,beta_gt)
         
         print(end-start)            
         start=time.time()   
 
-ieu.save_ieu(llw_list,llk_list,th_list,beta_gt)
+ieu.save(llw_list,llk_list,th_list,beta_gt)
 
 
 

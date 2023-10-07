@@ -16,7 +16,7 @@ methods = {
     'rk': rk,
     'kry': kry,
     'imu': imu,
-    'me': me
+    'me': me,
 }
 met = methods.get(method)
 if not met:
@@ -37,20 +37,20 @@ S_prop = np.eye(2)*1e-8
 
 
 ground = np.array((beta_gt,gamma_gt))
-th_gt = rk.params(ground,N)
+th_gt = met.params(ground,N)
 
 ll_gt = th_gt.loglike_w(w_all,T_all)
 
 
-beta,gamma = rk.naive_estimation(T_all,w_all)
+beta,gamma = met.naive_estimation(T_all,w_all)
 
 theta = np.array((beta,gamma))
-th_rk = rk.params(theta,N)
+th_met = met.params(theta,N)
 
-th = th_rk
+th = th_met
 ll = th.loglike_w(w_all,T_all)
 
-rk.update_th(ll,w_all,T_all,th,S_prop)
+met.update_th(ll,w_all,T_all,th,S_prop)
 
 
 # **Restarting chain**
@@ -64,7 +64,7 @@ times100 =[]
 
 start=time.time()
 for i in range(len(ll_list),N_sam):
-    ll,th  = rk.update_th(ll,w_all,T_all,th,S_prop)    
+    ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())
     th_list.append(th.value)
     #print(llw,llk, llw+llk)
@@ -86,7 +86,7 @@ for i in range(len(ll_list),N_sam):
 
 
 try:
-    df2 = pd.read_csv('times/{}_times_20.csv'.format(method.upper()),index=False)
+    df2 = pd.read_csv('times/{}_times_20.csv'.format(method.upper()))
 except:
     df2 = pd.DataFrame()
 label = 'N={}'.format(N)

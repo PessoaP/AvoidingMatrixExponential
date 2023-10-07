@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 
 import sys
 
-method = sys.argv[2]
+method = sys.argv[3]
 methods = {
     'rk': rk,
     'kry': kry,
@@ -45,16 +45,16 @@ S_prop = np.eye(6)*1e-8
 
 
 ground = np.array((beta_R_gt,beta_P_gt,l01_gt,l10_gt,gamma_R_gt,gamma_P_gt))
-th_gt = rk.params(ground,NP,NR)
+th_gt = met.params(ground,NP,NR)
 
 ll_gt = th_gt.loglike_w(w_all,T_all)
 
 theta = ground
-th = rk.params(theta,NP,NR)
+th = met.params(theta,NP,NR)
 
 ll = th.loglike_w(w_all,T_all)
 
-rk.update_th(ll,w_all,T_all,th,S_prop)
+met.update_th(ll,w_all,T_all,th,S_prop)
 
 ll_list =[]
 th_list =[]
@@ -64,7 +64,7 @@ times100 =[]
 
 start=time.time()
 for i in range(len(ll_list),N_sam):
-    ll,th  = rk.update_th(ll,w_all,T_all,th,S_prop)    
+    ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())
     th_list.append(th.value)
     #print(llw,llk, llw+llk)
@@ -85,12 +85,12 @@ for i in range(len(ll_list),N_sam):
 
 
 try:
-    df2 = pd.read_csv('times/STS_RK_times_20.csv')
+    df2 = pd.read_csv('times/STS_{}_times_20.csv'.format(method.upper()))
 except:
     df2 = pd.DataFrame()
 label = 'N={}'.format(N)
 df2[label] = np.stack(times100)
-df2.to_csv('times/STS_RK_times_20.csv',index=False)
+df2.to_csv('times/STS_{}_times_20.csv'.format(method.upper()),index=False)
 
 
 

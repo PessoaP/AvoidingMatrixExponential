@@ -22,8 +22,6 @@ def rhoGk(rho,mat_exp,k):
 def take_points(pe,w_all,T_ind):
     return pe[T_ind,w_all] 
 
-
-
 class params:
     def __init__(self,theta,N):
         birth,d = 1.0*theta
@@ -74,7 +72,7 @@ def update_th(ll,w_all,T_all,th,S_prop):
         return ll_prop,th_prop
     return ll,th
     
-def save_me(ll_list,th_list,beta_gt):
+def save(ll_list,th_list,beta_gt):
     ll_pd = np.stack(ll_list)
     th_pd = np.stack(th_list)
 

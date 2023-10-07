@@ -61,10 +61,6 @@ def get_A(sm):
     cols = np.concatenate((sm.columns,np.arange(sm.shape)))
     values = np.concatenate((sm.values,-sm_sum(sm.lines,sm.columns,sm.values,sm.shape)))
     return sparse_matrix(lins,cols,values,sm.shape)
-    #return sm + sparse_matrix(np.arange(sm.shape),
-    #                          np.arange(sm.shape),
-    #                          -sm.line_sum(),
-    #                          sm.shape)
     
 @njit
 def get_B(sm):
@@ -72,7 +68,6 @@ def get_B(sm):
     b_lines=np.concatenate((newlines,sm.lines))
     b_columns=np.concatenate((newlines,sm.columns))
 
-    #ad = sm.line_sum()
     ad =  sm_sum(sm.lines,sm.columns,sm.values,sm.shape)
     omega = 1.1*ad.max()
     b_values = np.concatenate(((1-ad/omega),(sm.values/omega)))

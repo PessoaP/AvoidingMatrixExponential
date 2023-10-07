@@ -1,4 +1,4 @@
-import IEU_inverse_2S as ieu
+import IEU_inverse_STS as ieu
 
 import pandas as pd
 import time
@@ -6,23 +6,30 @@ import time
 import numpy as np 
 from matplotlib import pyplot as plt
 
-N_sam = 100*20
+import sys
+
+N_sam = 100*20+1
 np.random.seed(10)
 
-beta_gt = int(sys.argv[1])
-gamma_gt = 1.0
-l01_gt = 2
-l10_gt = 1
+beta_R_gt = float(sys.argv[1])
+beta_P_gt = float(sys.argv[2])
 
-df = pd.read_csv('synthetic_data/2S_synthetic_data--beta={}.csv'.format(beta_gt))
-w_all = (df['counts']).to_numpy(np.int64)
+l01_gt = .1
+l10_gt = .05
+
+gamma_R_gt = 1.
+gamma_P_gt = .1
+
+df = pd.read_csv('synthetic_data/STS_synthetic_data--beta={}-{}.csv'.format(beta_R_gt,beta_P_gt))
+
+w_all = df[['counts_P','counts_R']].to_numpy().astype(int)
 T_all = (df['times']).to_numpy()
-N_RNA = 2*w_all.max()
+NP,NR = 2*w_all.max(axis=0)
 
-S_prop = np.eye(4)*1e-8
+S_prop = np.eye(6)*1e-8
 
-ground = np.array((beta_gt,gamma_gt,l01_gt,l10_gt))
-th_gt = ieu.params(ground,N_RNA)
+ground = np.array((beta_R_gt,beta_P_gt,l01_gt,l10_gt,gamma_R_gt,gamma_P_gt))
+th_gt = ieu.params(ground,NP,NR)
 
 ll_gt_list = []
 k_all = 1+(T_all*th_gt.omega).astype(int)
@@ -30,7 +37,7 @@ llw = th_gt.loglike_w_k(w_all,k_all)
 llk = th_gt.loglike_k(k_all,T_all)
 
 theta = 1.0*ground
-th_ieu = ieu.params(theta,N_RNA)
+th_ieu = ieu.params(theta,NP,NR)
 
 k_all = th_ieu.sample_k(T_all)
 llw = th_ieu.loglike_w_k(w_all,k_all)
@@ -68,15 +75,15 @@ for i in range(len(llw_list),N_sam):
             print('iteration ',i)
             times100.append(end-start)
             print('accept rate',np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0)))
-
+        
         print(end-start)            
         start=time.time()   
 
 
 try:
-    df2 = pd.read_csv('times/2S_IEU_times_20.csv')
+    df2 = pd.read_csv('times/STS_IEU_times_20.csv')
 except:
     df2 = pd.DataFrame()
 label = 'N={}'.format(th.N)
 df2[label] = np.stack(times100)
-df2.to_csv('times/2S_IEU_times_20.csv',index=False)
+df2.to_csv('times/STS_IEU_times_20.csv',index=False)
