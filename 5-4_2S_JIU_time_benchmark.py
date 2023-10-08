@@ -5,6 +5,7 @@ import time
 
 import numpy as np 
 from matplotlib import pyplot as plt
+import sys
 
 N_sam = 100*20
 np.random.seed(10)
