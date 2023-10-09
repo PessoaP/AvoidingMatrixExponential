@@ -125,9 +125,10 @@ for i in range(len(llw_list),N_sam):
             print('iteration ',i)
             times100.append(end-start)
             print('accept rate',np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0)))
-            
+            if i%2000 == 0:
+                ieu.save(llw_list,llk_list,th_list,beta_gt)
         print(end-start)
         start=time.time()   
 
-ieu.save_ieu(llw_list,llk_list,th_list,beta_gt)
+ieu.save(llw_list,llk_list,th_list,beta_gt)
 

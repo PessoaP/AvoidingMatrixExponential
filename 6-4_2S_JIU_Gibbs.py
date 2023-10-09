@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 import sys
 
 N_sam = 100*2500
-np.random.seed(10)
+np.random.seed(100)
 
 beta_gt = int(sys.argv[1])
 gamma_gt = 1.0
@@ -34,8 +34,9 @@ for i in range(10):
     ll_gt_list.append(llw.sum()+llk.sum())
 
 ll_gt = np.mean(ll_gt_list)
+print(ll_gt)
 
-theta = 1.0*ground
+theta = np.concatenate(([w_all.max()],np.ones(3)*1.5))
 th_ieu = ieu.params(theta,N_RNA)
 
 

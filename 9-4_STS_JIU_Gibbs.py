@@ -42,7 +42,7 @@ for i in range(10):
 ll_gt = np.mean(ll_gt_list)
 ll_gt
 
-theta = ground
+theta = (.5+np.random.rand(6))*ground
 th_ieu = ieu.params(theta,NP,NR)
 
 
@@ -67,6 +67,52 @@ times100 =[]
 mat_list=[]
 mat_list.append(S_prop)
 
+
+acc_count=0
+i = 0
+
+start=time.time() 
+while acc_count<10:
+    i+=1
+    llw,llk,th  = ieu.update_th(llw,llk,k_all,w_all,T_all,th,S_prop)
+    llw,llk,k_all = ieu.update_k(llw,llk,k_all,w_all,T_all,th)
+    
+    llw_list.append(llw.sum())
+    llk_list.append(llk.sum())
+    th_list.append(th.value)
+
+   
+
+    if i%100 == 0:
+        end=time.time()
+        llw_last = np.stack(llw_list[-101:])
+        llk_last = np.stack(llk_list[-101:])
+        th_last  = np.stack(th_list[-101:])
+        
+        print(llw_last.mean(),llk_last.mean())
+        print(th_last.mean(axis=0)) 
+        
+        if i>0:
+            print('iteration ',i)
+            acceptance = np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0))
+            if acceptance>.2 and acceptance<.5:
+                acc_count+=1
+            else:
+                acc_count = 0
+            print('accept rate',acceptance)
+            if i%300 == 0:
+                S_prop = ieu.update_S(th_last)
+                mat_list.append(S_prop)
+                print(S_prop)
+            print(end-start)
+        start=time.time() 
+        
+
+# **Restarting adaptative**
+
+theta = th_list[np.argmax(np.array(llw_list)+np.array(llw_list))]
+th = ieu.params(theta,NP,NR)
+S_prop = np.eye(6)*1e-8
 
 acc_count=0
 i = 0

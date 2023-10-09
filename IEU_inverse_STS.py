@@ -64,7 +64,7 @@ def update_k(llw,llk,k_all,w_all,T_all,th):
     llk = th.loglike_k(k_all,T_all)
     llk_prop = th.loglike_k(k_all_prop,T_all)
 
-    update = np.log(np.random.rand(k_all.size)) < llw_prop - llw + llk_prop - llk #last two terms in test
+    update = np.log(np.random.rand(k_all.size)) < llw_prop - llw #####+ llk_prop - llk #last two terms in test
 
     res_k = arr_replace(k_all,k_all_prop,update)
     res_llw = arr_replace(llw,llw_prop,update)

@@ -54,8 +54,10 @@ def make_initial(center,var,N):
 
 @njit
 def arr_replace(old,new,replace):
-    res = np.zeros_like(old)
+    #return new*replace + old*np.logical_not(replace)
+    #res = np.zeros_like(old)
+    res = old
     res[replace] = new[replace]
-    res[np.logical_not(replace)] = old[np.logical_not(replace)]
-    return old
+    res[np.logical_not(replace)] = old[np.logical_not(replace)]    
+    return res
 
