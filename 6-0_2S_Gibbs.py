@@ -22,7 +22,7 @@ if not met:
 
 
 N_sam = 100*2500
-np.random.seed(100)
+np.random.seed(100+int(method,base=36))
 
 beta_gt = int(sys.argv[1])
 gamma_gt = 1.0
@@ -98,6 +98,7 @@ while acc_count<10:
                 mat_list.append(S_prop)
                 print(S_prop)
             print(end-start)
+            
         start=time.time() 
         
 #Restarting adaptative
@@ -137,6 +138,9 @@ while acc_count<10:
                 print(S_prop)
             print(end-start)
         start=time.time() 
+
+
+met.save(ll_list,th_list,beta_gt,burnin=True)
 
 #Restarting again, now for good
 ll_list =[]

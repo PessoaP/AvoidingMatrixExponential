@@ -6,8 +6,8 @@ import sys
 
 N_r = 300
 
-beta_R_gt = float(sys.argv[1])
-beta_P_gt = float(sys.argv[2])
+beta_R = float(sys.argv[1])
+beta_P = float(sys.argv[2])
 
 l01 = .1
 l10 = .05

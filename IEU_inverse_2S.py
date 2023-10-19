@@ -53,15 +53,13 @@ class params:
     
 def update_k(llw,llk,k_all,w_all,T_all,th):
     k_all_prop = th.sample_k(T_all)
-
-    #k_all_prop = np.abs(k_all + np.round(np.random.normal(0,th.omega*T_all/25)).astype(int))
     
     llw_prop = th.loglike_w_k(w_all,k_all_prop)
 
-    llk = th.loglike_k(k_all,T_all)
-    llk_prop = th.loglike_k(k_all_prop,T_all)
+    #llk = th.loglike_k(k_all,T_all)
+    #llk_prop = th.loglike_k(k_all_prop,T_all)
     
-    update = np.log(np.random.rand(w_all.size)) < llw_prop - llw #####+ llk_prop - llk #last two terms in test
+    update = np.log(np.random.rand(w_all.size)) < llw_prop - llw 
     
     res_k = arr_replace(k_all,k_all_prop,update)
     res_llw = arr_replace(llw,llw_prop,update)
@@ -85,7 +83,7 @@ def update_th(llw,llk,k_all,w_all,T_all,th,S_prop):
     return llw,llk,th
 
 
-def save(llw_list,llk_list,th_list,beta_gt):
+def save(llw_list,llk_list,th_list,beta_gt,burnin=False):
     llw_pd = np.stack(llw_list)
     llk_pd = np.stack(llk_list)
     th_pd = np.stack(th_list)
@@ -94,4 +92,9 @@ def save(llw_list,llk_list,th_list,beta_gt):
     df['log p(w|k,th)'] = llw_pd
     df['log p(k|th)'] = llk_pd
 
-    df.to_csv('inference/2S_IEU_inference_beta={}.csv'.format(beta_gt),index=False)
+    filename = '2S_IEU_inference_beta={}.csv'.format(beta_gt)
+    folder ='inference/'
+    if burnin:
+        folder='burn/'
+
+    df.to_csv(folder+filename,index=False)

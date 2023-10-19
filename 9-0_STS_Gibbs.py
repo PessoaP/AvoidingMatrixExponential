@@ -99,7 +99,6 @@ while acc_count<10:
         
 
 
-# In[11]:
 
 
 #Restarting adaptative
@@ -141,8 +140,6 @@ while acc_count<10:
         start=time.time() 
 
 
-# In[12]:
-
 
 #Restarting again
 
@@ -151,8 +148,6 @@ th_list =[]
 
 times100 =[]
 
-
-# In[13]:
 
 
 start=time.time()
@@ -181,13 +176,7 @@ for i in range(len(ll_list),N_sam):
 
 
 
-# In[ ]:
-
-
 met.save(ll_list,th_list,beta_R_gt,beta_P_gt)
-
-
-# In[ ]:
 
 
 

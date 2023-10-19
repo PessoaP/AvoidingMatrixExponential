@@ -102,11 +102,16 @@ def update_th(ll,w_all,T_all,th,S_prop):
         return ll_prop,th_prop
     return ll,th
 
-def save(ll_list,th_list,beta_gt):
+def save(ll_list,th_list,beta_gt,burnin=False):
     ll_pd = np.stack(ll_list)
     th_pd = np.stack(th_list)
 
     df = pd.DataFrame(th_pd,columns=['birth rate','death rate','activation rate','deactivtion rate'])
     df['log p(w|th)'] = ll_pd
 
-    df.to_csv('inference/2S_KRY_inference_beta={}.csv'.format(beta_gt),index=False)
+    filename = '2S_inference_beta={}.csv'.format(beta_gt)
+    folder ='inference/'
+    if burnin:
+        folder='burn/'
+
+    df.to_csv(folder+filename,index=False)

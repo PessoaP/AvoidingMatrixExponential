@@ -63,8 +63,11 @@ mat_list.append(S_prop)
 acc_count=0
 i = 0
 
+avg_1000 = llw.sum()
+keep=True
+
 start=time.time() 
-while acc_count<10:
+while keep:
     i+=1
     llw,llk,th  = ieu.update_th(llw,llk,k_all,w_all,T_all,th,S_prop)
     llw,llk,k_all = ieu.update_k(llw,llk,k_all,w_all,T_all,th)
@@ -95,12 +98,26 @@ while acc_count<10:
                 S_prop = ieu.update_S(th_last)
                 mat_list.append(S_prop)
                 print(S_prop)
+
+            if i%2000 ==0:
+                temp_avg_1000 = np.stack(llw_list[-2001:]).mean()
+                print('stable?',avg_1000,temp_avg_1000)
+                if avg_1000>temp_avg_1000:
+                    print('stable')
+                    keep = False
+                else:
+                    avg_1000 = temp_avg_1000
+
             print(end-start)
         start=time.time() 
         
 #Restarting adaptative
 theta = th_list[np.argmax(np.array(llw_list)+np.array(llw_list))]
 th = ieu.params(theta,N_RNA)
+k_all = th.sample_k(T_all)
+llk = th.loglike_k(k_all,T_all)
+llk = th.loglike_w_k(w_all,k_all)
+
 S_prop = np.eye(4)*1e-8
 
 acc_count=0
@@ -141,6 +158,7 @@ while acc_count<10:
             print(end-start)
         start=time.time() 
 
+ieu.save(llw_list,llk_list,th_list,beta_gt,burnin=True)
 
 llw_list =[]
 llk_list =[]
