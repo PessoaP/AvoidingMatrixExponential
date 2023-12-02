@@ -35,9 +35,7 @@ T_all = (df['times']).to_numpy()
 N_RNA = 2*w_all.max()
 
 
-
 S_prop = np.eye(4)*1e-8
-
 
 ground = np.array((beta_gt,gamma_gt,l01_gt,l10_gt))
 th_gt = met.params(ground,N_RNA)
@@ -58,6 +56,7 @@ met.update_th(ll,w_all,T_all,th,S_prop)
 
 
 # **Doing adaptative**
+S_prop = np.eye(4)*1e-8
 
 ll_list =[]
 th_list =[]
@@ -69,6 +68,7 @@ mat_list.append(S_prop)
 
 acc_count=0
 i = 0
+
 
 start=time.time() 
 while acc_count<10:

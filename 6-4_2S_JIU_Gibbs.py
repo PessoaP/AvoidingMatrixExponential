@@ -20,7 +20,6 @@ w_all = (df['counts']).to_numpy(np.int64)
 T_all = (df['times']).to_numpy()
 N_RNA = 2*w_all.max()
 
-S_prop = np.eye(4)*1e-8
 
 ground = np.array((beta_gt,gamma_gt,l01_gt,l10_gt))
 th_gt = ieu.params(ground,N_RNA)
@@ -36,7 +35,8 @@ for i in range(10):
 ll_gt = np.mean(ll_gt_list)
 print(ll_gt)
 
-theta = np.concatenate(([w_all.max()],np.ones(3)*1.5))
+#theta = np.concatenate(([w_all.max()],np.ones(3)*1.5))
+theta = np.concatenate(([w_all.max()],np.exp(np.random.normal(size=3))))
 th_ieu = ieu.params(theta,N_RNA)
 
 
@@ -48,6 +48,7 @@ llk = th_ieu.loglike_k(k_all,T_all)
 th=th_ieu
 
 # **Doing adaptative**
+S_prop = np.eye(4)*1e-8
 
 llw_list =[]
 llk_list =[]
@@ -63,11 +64,11 @@ mat_list.append(S_prop)
 acc_count=0
 i = 0
 
-avg_1000 = llw.sum()
+
 keep=True
 
 start=time.time() 
-while keep:
+while acc_count<10:
     i+=1
     llw,llk,th  = ieu.update_th(llw,llk,k_all,w_all,T_all,th,S_prop)
     llw,llk,k_all = ieu.update_k(llw,llk,k_all,w_all,T_all,th)
@@ -89,7 +90,7 @@ while keep:
             print('iteration ',i)
             #times100.append(end-start)
             acceptance = np.mean(((th_last[1:]-th_last[:-1]).mean(axis=1)!=0))
-            if acceptance>.2 and acceptance<.5:
+            if acceptance>.2 and acceptance<.5 and i>100000:
                 acc_count+=1
             else:
                 acc_count = 0
@@ -99,14 +100,6 @@ while keep:
                 mat_list.append(S_prop)
                 print(S_prop)
 
-            if i%2000 ==0:
-                temp_avg_1000 = np.stack(llw_list[-2001:]).mean()
-                print('stable?',avg_1000,temp_avg_1000)
-                if avg_1000>temp_avg_1000:
-                    print('stable')
-                    keep = False
-                else:
-                    avg_1000 = temp_avg_1000
 
             print(end-start)
         start=time.time() 

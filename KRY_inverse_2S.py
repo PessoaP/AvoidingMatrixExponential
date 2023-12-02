@@ -6,30 +6,6 @@ from scipy.linalg import expm
 
 from models import lam_2S as get_lam
 
-@njit
-def arnoldi(A, b, n):
-    h = np.zeros((n+1,n))
-    Qt = np.zeros((n+1,A.shape))
-
-    q = b/np.linalg.norm(b)
-    Qt[0] = q
-
-    for k in range(n):
-        v = smn.dot(q,A)
-        for j in range(k+1):
-            q = Qt[j]
-            h[j,k] = np.dot(q,v)
-            v = v - h[j,k]*q
-        h[k+1,k] = np.linalg.norm(v)
-
-        if h[k+1,k] > 1e-12:
-            q = v/h[k+1,k] 
-            Qt[k+1] = q
-        else:
-            Q = Qt.T
-            return Q[:k,:k-1],h[:k-1, :k]
-    Q=Qt.T
-    return Q[:,:-1],h[:-1, :]
 
 @njit
 def kryreconstruct(Q,exp_H,rho):
@@ -67,7 +43,7 @@ class params:
         self.N = N_RNA*N_DNA
         self.lam = get_lam(birth,d,l01,l10,N_RNA,N_DNA)
         self.A = smn.get_A(self.lam)
-        self.dt = 2.0*kappa/(np.abs(self.A.values).max())
+        self.dt = 1.5*kappa/(np.abs(self.A.values).max())
         self.kappa = kappa
 
         self.log_prior = lprior(theta)

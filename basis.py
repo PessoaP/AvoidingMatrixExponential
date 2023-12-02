@@ -2,6 +2,7 @@ import numpy as np
 from scipy.special import gammaln
 from numba import njit,typed,types
 from scipy.optimize import curve_fit
+import smn
 
 #these are compiled functions for the forward simulation
 @njit
@@ -54,10 +55,34 @@ def make_initial(center,var,N):
 
 @njit
 def arr_replace(old,new,replace):
-    #return new*replace + old*np.logical_not(replace)
-    #res = np.zeros_like(old)
-    res = old
+    res = np.zeros_like(old)
+    #res = old
     res[replace] = new[replace]
     res[np.logical_not(replace)] = old[np.logical_not(replace)]    
     return res
 
+
+@njit
+def arnoldi(A, rho, n):
+    h = np.zeros((n+1,n))
+    Qt = np.zeros((n+1,A.shape))
+
+    q = rho/np.linalg.norm(rho)
+    Qt[0] = q
+
+    for k in range(n):
+        v = smn.dot(q,A)
+        for j in range(k+1):
+            q = Qt[j]
+            h[j,k] = np.dot(q,v)
+            v = v - h[j,k]*q
+        h[k+1,k] = np.linalg.norm(v)
+
+        if h[k+1,k] > 1e-12:
+            q = v/h[k+1,k] 
+            Qt[k+1] = q
+        else:
+            Q = Qt.T
+            return Q[:k,:k-1],h[:k-1, :k]
+    Q=Qt.T
+    return Q[:,:-1],h[:-1, :]
