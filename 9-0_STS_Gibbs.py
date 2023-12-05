@@ -1,6 +1,6 @@
 import RK_inverse_STS as rk
 import KRY_inverse_STS as kry
-import IMU_inverse_STS as imu
+import RMJP_inverse_STS as rmjp
 
 import pandas as pd
 import time
@@ -14,15 +14,15 @@ method = sys.argv[3]
 methods = {
     'rk': rk,
     'kry': kry,
-    'imu': imu,
+    'rmjp': rmjp,
 }
 met = methods.get(method)
 if not met:
     print('method not recognized')
 
 N_sam = 100*2500
-np.random.seed(100)
-
+#np.random.seed(100)
+np.random.seed(1000+int(method,base=36))
 
 beta_R_gt, beta_P_gt = float(sys.argv[1]),float(sys.argv[2])
 
@@ -68,7 +68,7 @@ acc_count=0
 i = 0
 
 start=time.time() 
-while acc_count<10:
+while acc_count<20:
     i+=1
     ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())
@@ -110,7 +110,7 @@ acc_count=0
 i = 0
 
 start=time.time() 
-while acc_count<10:
+while acc_count<20:
     i+=1
     ll,th  = met.update_th(ll,w_all,T_all,th,S_prop)    
     ll_list.append(ll.sum())

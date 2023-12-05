@@ -43,7 +43,7 @@ class params:
         self.N = N_RNA*N_DNA
         self.lam = get_lam(birth,d,l01,l10,N_RNA,N_DNA)
         self.A = smn.get_A(self.lam)
-        self.dt = 1.5*kappa/(np.abs(self.A.values).max())
+        self.dt = 2.*kappa/(np.abs(self.A.values).max())
         self.kappa = kappa
 
         self.log_prior = lprior(theta)

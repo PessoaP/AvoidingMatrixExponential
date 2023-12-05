@@ -41,7 +41,7 @@ class params:
         self.N = N
         self.lam = get_lam(birth,d,N)
         self.A = smn.get_A(self.lam)
-        self.dt = 1.5*kappa/(np.abs(self.A.values).max())
+        self.dt = 2.*kappa/(np.abs(self.A.values).max())
         self.kappa = kappa
 
         self.log_prior = lprior(theta)

@@ -1,6 +1,6 @@
 import RK_inverse as rk
 import KRY_inverse as kry
-import IMU_inverse as imu
+import RMJP_inverse as rmjp
 import ME_inverse as me
 
 import pandas as pd
@@ -15,7 +15,7 @@ method = sys.argv[2]
 methods = {
     'rk': rk,
     'kry': kry,
-    'imu': imu,
+    'rmjp': rmjp,
     'me': me
 }
 met = methods.get(method)

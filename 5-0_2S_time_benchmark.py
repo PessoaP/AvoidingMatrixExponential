@@ -1,6 +1,6 @@
 import RK_inverse_2S as rk
 import KRY_inverse_2S as kry
-import IMU_inverse_2S as imu
+import RMJP_inverse_2S as rmjp
 
 import pandas as pd
 import time
@@ -14,7 +14,7 @@ method = sys.argv[2]
 methods = {
     'rk': rk,
     'kry': kry,
-    'imu': imu,
+    'rmjp': rmjp,
 }
 met = methods.get(method)
 if not met:
